@@ -10,7 +10,7 @@ public class changeGraphics : MonoBehaviour
 {
     [SerializeField] private RenderPipelineAsset[] RPA; // 0: Very Low, 1: Low, 2: Midium, 3: High
     [SerializeField] private Slider shadowQualitySlider;
-    
+
 
     [SerializeField] private GameObject[] videoSettingsObjects;
     [SerializeField] private GameObject[] audioSettingsObjects;
@@ -22,7 +22,7 @@ public class changeGraphics : MonoBehaviour
 
     [SerializeField] private Toggle MetricUnits;
     [SerializeField] private TextMeshProUGUI metricUnitLabel;
-    
+
     [SerializeField] private Transform knobParent;
     [SerializeField] private float angle = 40f;
 
@@ -31,89 +31,157 @@ public class changeGraphics : MonoBehaviour
     [SerializeField] TextMeshProUGUI inputTypeLabel;
     [SerializeField] private inputType IT;
 
+    [Header("Tabs")]
+    [SerializeField] private Button[] tabButtons;
 
-    private void Start() {
-        if(IT.inputType_ == 0){
+
+    private void Start()
+    {
+        if (IT.inputType_ == 0)
+        {
             inputTypeLabel.text = "Buttons";
-        }else{
+        }
+        else
+        {
             inputTypeLabel.text = "Tilt";
         }
         int x = PlayerPrefs.GetInt("QualityOption");
         QualitySettings.renderPipeline = RPA[x];
         shadowQualitySlider.value = x;
-        if(PlayerPrefs.GetInt("MetricUnit", 0) == 0){
+        if (PlayerPrefs.GetInt("MetricUnit", 0) == 0)
+        {
             MetricUnits.isOn = false;
             metricUnitLabel.text = "KMPH";
-            knobParent.LeanRotate(new Vector3(0f,0f,angle),0.2f).setEaseInQuart();
-        }else{
+            knobParent.LeanRotate(new Vector3(0f, 0f, angle), 0.2f).setEaseInQuart();
+        }
+        else
+        {
             MetricUnits.isOn = true;
-            knobParent.LeanRotate(new Vector3(0f,0f,-angle),0.2f).setEaseInQuart();
+            knobParent.LeanRotate(new Vector3(0f, 0f, -angle), 0.2f).setEaseInQuart();
             metricUnitLabel.text = "MPH";
         }
         MasterSlider.value = PlayerPrefs.GetFloat("MasterVolume", 0);
         setVolume();
+
+        foreach (Button b in tabButtons)
+        {
+            b.onClick.AddListener(() =>
+            {
+                ChangeTab(int.Parse(b.gameObject.name));
+            });
+        }
     }
-    public void ChangeSetting() {
+    public void ChangeSetting()
+    {
         QualitySettings.renderPipeline = RPA[(int)shadowQualitySlider.value];
     }
 
-    public void Save() {
+    public void Save()
+    {
         //this.gameObject.SetActive(false);
-        PlayerPrefs.SetInt("QualityOption",(int)shadowQualitySlider.value);
-        PlayerPrefs.SetFloat("MasterVolume",MasterSlider.value);
-        if(MetricUnits.isOn){
+        PlayerPrefs.SetInt("QualityOption", (int)shadowQualitySlider.value);
+        PlayerPrefs.SetFloat("MasterVolume", MasterSlider.value);
+        if (MetricUnits.isOn)
+        {
             PlayerPrefs.SetInt("MetricUnit", 1);
             metricUnitLabel.text = "MPH";
-        }else{
+        }
+        else
+        {
             PlayerPrefs.SetInt("MetricUnit", 0);
             metricUnitLabel.text = "KMPH";
         }
     }
 
-    public void ChangeInputType() {
+    public void ChangeInputType()
+    {
         inputType = IT.inputType_ == 0 ? true : false;
-        if(inputType){
+        if (inputType)
+        {
             IT.inputType_ = 1;
             PlayerPrefs.SetInt("InputType", 1);
             inputTypeLabel.text = "Tilt";
-        }else{
+        }
+        else
+        {
             IT.inputType_ = 0;
             PlayerPrefs.SetInt("InputType", 0);
             inputTypeLabel.text = "Buttons";
         }
     }
 
-    public void ChangeMetricLabel() {
-        if(metricUnitLabel.text == "MPH"){
+    public void ChangeMetricLabel()
+    {
+        if (metricUnitLabel.text == "MPH")
+        {
             metricUnitLabel.text = "KMPH";
-            knobParent.LeanRotate(new Vector3(0f,0f,angle),0.2f).setEaseInQuart();
-        }else{
+            knobParent.LeanRotate(new Vector3(0f, 0f, angle), 0.2f).setEaseInQuart();
+        }
+        else
+        {
             metricUnitLabel.text = "MPH";
-            knobParent.LeanRotate(new Vector3(0f,0f,-angle),0.2f).setEaseInQuart();
+            knobParent.LeanRotate(new Vector3(0f, 0f, -angle), 0.2f).setEaseInQuart();
         }
     }
 
-    public void setVolume(){
+    [SerializeField] private Color disabledColor;
+    [SerializeField] private Color enabledColor;
+    void ChangeTab(int tabIndex)
+    {
+        switch (tabIndex)
+        {
+            case 0:
+                foreach (GameObject obj in videoSettingsObjects)
+                {
+                    obj.SetActive(true);
+                }
+                foreach (GameObject obj in audioSettingsObjects)
+                {
+                    obj.SetActive(false);
+                }
+                break;
+            case 1:
+                foreach (GameObject obj in videoSettingsObjects)
+                {
+                    obj.SetActive(false);
+                }
+                foreach (GameObject obj in audioSettingsObjects)
+                {
+                    obj.SetActive(true);
+                }
+                break;
+            case 2:
+                foreach (GameObject obj in videoSettingsObjects)
+                {
+                    obj.SetActive(false);
+                }
+                foreach (GameObject obj in audioSettingsObjects)
+                {
+                    obj.SetActive(true);
+                }
+                break;
+            default:
+                break;
+        }
+        for (int i = 0; i < tabButtons.Length; i++)
+        {
+            Shadow outline = tabButtons[i].gameObject.GetComponent<Shadow>();
+
+            if (i == tabIndex)
+            {
+                outline.effectColor = enabledColor;
+            }
+            else
+            {
+                outline.effectColor = disabledColor;
+            }
+        }
+    }
+
+    public void setVolume()
+    {
         Debug.Log(MasterSlider.value);
-        MasterVolume.SetFloat("volume",MasterSlider.value);
-        ImpactVolume.SetFloat("volume",MasterSlider.value-0.2f);
-    }
-
-    public void setVideo(){
-        foreach(GameObject obj in videoSettingsObjects) {
-            obj.SetActive(true);
-        }
-        foreach(GameObject obj in audioSettingsObjects) {
-            obj.SetActive(false);
-        }
-    }
-
-    public void setAudio(){
-        foreach(GameObject obj in videoSettingsObjects) {
-            obj.SetActive(false);
-        }
-        foreach(GameObject obj in audioSettingsObjects) {
-            obj.SetActive(true);
-        }
+        MasterVolume.SetFloat("volume", MasterSlider.value);
+        ImpactVolume.SetFloat("volume", MasterSlider.value - 0.2f);
     }
 }

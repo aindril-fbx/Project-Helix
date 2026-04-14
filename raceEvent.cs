@@ -16,7 +16,7 @@ public class raceEvent : MonoBehaviour
     [SerializeField] private bool lapped = false;
     [SerializeField] private int lap = 1;
     [Range(2, 100)]
-    [SerializeField] private int totalLaps = 2;
+    [SerializeField] private int totalLaps = 10;
     [SerializeField] private float distanceFromFinishLine = 0f;
 
     public bool raceStarted = false;
@@ -82,7 +82,7 @@ public class raceEvent : MonoBehaviour
         UpdateUI();
     }
 
-    public void changeActiveCheckpoint(int index)
+    public void changeActiveCheckpoint(int index, waypointSetter WPS)
     {
         if (!raceStarted)
         {
@@ -110,6 +110,8 @@ public class raceEvent : MonoBehaviour
             }
 
         }
+        int waypoint = (index + 2) % totalCP;
+        WPS.targetTransform = CheckPoints[waypoint].transform;
 
     }
 
@@ -118,7 +120,15 @@ public class raceEvent : MonoBehaviour
         TimeSpan timeSpan = TimeSpan.FromSeconds(t);
         TimeSpan timeSpan2 = TimeSpan.FromSeconds(bestTime);
         lapText.text = lap + "/" + totalLaps;
-        if(bestTimeText != null) bestTimeText.text = timeSpan2.ToString(@"mm\:ss\:ff");
+        if (bestTimeText != null) bestTimeText.text = timeSpan2.ToString(@"mm\:ss\:ff");
+        if (Time.timeScale >= 0.1 && raceStarted)
+        {
+            mainCanvasObj.SetActive(true);
+        }
+        else
+        {
+            mainCanvasObj.SetActive(false);
+        }
     }
 
     IEnumerator showLapTime(float time)

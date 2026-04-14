@@ -7,8 +7,9 @@ using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using TMPro;
 
-public class ComboDisplay : MonoBehaviour {
-    
+public class ComboDisplay : MonoBehaviour
+{
+
     [SerializeField] private Rigidbody rb;
     [SerializeField] private GameObject displayObject;
     [SerializeField] private MessageTextController MTC;
@@ -33,7 +34,7 @@ public class ComboDisplay : MonoBehaviour {
     [SerializeField] private float GroundCheckRadius = 0.5f;
 
     [SerializeField] private AudioSource tickSound;
-    
+
     [Header("Float Timer")]
     float time_;
     [SerializeField] private float delay = 3f;
@@ -59,7 +60,8 @@ public class ComboDisplay : MonoBehaviour {
     public Ghost ghost;
     public bool record = false;
     [SerializeField] private Vector2 defaultPositon;
-    void Awake() {
+    void Awake()
+    {
         controls = new PlayerControls();
         controls.Gameplay.Enable();
         controls.Gameplay.HideUI.performed += ctx => photoModeState();
@@ -67,83 +69,111 @@ public class ComboDisplay : MonoBehaviour {
     }
     [SerializeField] private float eventScore = 0f;
     float dot;
-    private void FixedUpdate() {
+    private void FixedUpdate()
+    {
         bool isGrounded;
-        isGrounded = Physics.CheckSphere(GroundCheck.position, GroundCheckRadius , GroundLayer);
-        Vector2 velocity = new Vector2(Mathf.Round(rb.transform.InverseTransformVector(rb.linearVelocity).x) ,Mathf.Round(rb.transform.InverseTransformVector(rb.linearVelocity).z));
-        Vector2 transformAngle = new Vector2(rb.transform.localEulerAngles.z,0);
-        float dotProduct = Vector2.Dot(velocity.normalized,transformAngle.normalized);
+        isGrounded = Physics.CheckSphere(GroundCheck.position, GroundCheckRadius, GroundLayer);
+        Vector2 velocity = new Vector2(Mathf.Round(rb.transform.InverseTransformVector(rb.linearVelocity).x), Mathf.Round(rb.transform.InverseTransformVector(rb.linearVelocity).z));
+        Vector2 transformAngle = new Vector2(rb.transform.localEulerAngles.z, 0);
+        float dotProduct = Vector2.Dot(velocity.normalized, transformAngle.normalized);
         float shake = 100f * dotProduct;
-        displayObject.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(displayObject.GetComponent<RectTransform>().anchoredPosition,defaultPositon + new Vector2(UnityEngine.Random.Range(-shake,shake),UnityEngine.Random.Range(-shake,shake)),Time.deltaTime);
-        if(velocity.magnitude > 10f && Mathf.Abs(dotProduct)>0.3f && isGrounded){
+        displayObject.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(displayObject.GetComponent<RectTransform>().anchoredPosition, defaultPositon + new Vector2(UnityEngine.Random.Range(-shake, shake), UnityEngine.Random.Range(-shake, shake)), Time.deltaTime);
+        if (velocity.magnitude > 10f && Mathf.Abs(dotProduct) > 0.3f && isGrounded)
+        {
             time_ = 0f;
             Score += rate;
-            if(!tickSound.isPlaying){
+            if (!tickSound.isPlaying)
+            {
                 tickSound.Play();
             }
-            if(Score > 20f){
+            if (Score > 20f)
+            {
                 //delayAnimation.Stop();
                 labelText.text = "Drift";
                 displayObject.SetActive(true);
                 ShowDisplay = true;
-                if(comboMeter.fillAmount >= 1f){
+                if (comboMeter.fillAmount >= 1f)
+                {
                     comboMeter.fillAmount = 0f;
                     Multiplier += 1f;
-                }else{
-                    comboMeter.fillAmount += (rate/Multiplier)/50f * Mathf.Abs(dotProduct);
+                }
+                else
+                {
+                    comboMeter.fillAmount += (rate / Multiplier) / 50f * Mathf.Abs(dotProduct);
                 }
                 Score_ = Score * Multiplier;
             }
-        }else if(velocity.magnitude > 80f && isGrounded){
+        }
+        else if (velocity.magnitude > 80f && isGrounded)
+        {
             time_ = 0f;
-            Score += rate*0.2f;
-            if(!tickSound.isPlaying){
+            Score += rate * 0.2f;
+            if (!tickSound.isPlaying)
+            {
                 tickSound.Play();
             }
-            if(Score > 20f){
+            if (Score > 20f)
+            {
                 //delayAnimation.Stop();
                 labelText.text = "Speed";
                 displayObject.SetActive(true);
                 ShowDisplay = true;
-                if(comboMeter.fillAmount >= 1f){
+                if (comboMeter.fillAmount >= 1f)
+                {
                     comboMeter.fillAmount = 0f;
                     Multiplier += 1f;
-                }else{
-                    comboMeter.fillAmount += (rate/Multiplier)/130f;
+                }
+                else
+                {
+                    comboMeter.fillAmount += (rate / Multiplier) / 130f;
                 }
                 Score_ = Score * Multiplier;
             }
-        }else if(!isGrounded){
+        }
+        else if (!isGrounded)
+        {
             time_ = 0f;
             Score += rate;
-            if(!tickSound.isPlaying){
+            if (!tickSound.isPlaying)
+            {
                 tickSound.Play();
             }
-            if(Score > 20f){
+            if (Score > 20f)
+            {
                 //delayAnimation.Stop();
                 labelText.text = "Air Time";
                 displayObject.SetActive(true);
                 ShowDisplay = true;
-                if(comboMeter.fillAmount >= 1f){
+                if (comboMeter.fillAmount >= 1f)
+                {
                     comboMeter.fillAmount = 0f;
                     Multiplier += 1f;
-                }else{
-                    comboMeter.fillAmount += (rate/Multiplier)/130f;
+                }
+                else
+                {
+                    comboMeter.fillAmount += (rate / Multiplier) / 130f;
                 }
                 Score_ = Score * Multiplier;
             }
-        
-        }else{
-            if(ShowDisplay){
+
+        }
+        else
+        {
+            if (ShowDisplay)
+            {
                 //delayAnimation.Play();
                 time_ += Time.deltaTime;
-                if(time_ >= delay){
+                if (time_ >= delay)
+                {
                     ShowDisplay = false;
                     AddScore = true;
                 }
-            }else{
+            }
+            else
+            {
                 displayObject.SetActive(false);
-                if(AddScore){
+                if (AddScore)
+                {
                     MTC.gameObject.SetActive(true);
                     MTC.setText(Mathf.Round(Score_) + " Points");
                     eventScore += Score_;
@@ -156,45 +186,55 @@ public class ComboDisplay : MonoBehaviour {
         }
         dot = dotProduct * 180f;
         scoreDisplay.text = Mathf.Round(Score) + "";
-        mulDisplay.text = "x " + Multiplier;
+        mulDisplay.text = "x" + Multiplier;
 
         eventScoreLabel.text = eventScore + "";
     }
 
-    public void playAnimation(int x){
+    public void playAnimation(int x)
+    {
         Score = 0f;
         Multiplier = 1f;
         comboMeter.fillAmount = 0f;
         Score_ = 0f;
         StartCoroutine(countDown());
-        if(record){
+        if (record)
+        {
             GhostRecorder GR = rb.transform.gameObject.AddComponent(typeof(GhostRecorder)) as GhostRecorder;
             GR.enabled = true;
             GR.ghost = ghost;
             ghost.isRecord = true;
             GR.StartRecording();
         }
-        if(x == 0){
+        if (x == 0)
+        {
             eventScore = 0f;
             eventLabel.text = "DRIFT EVENT";
             eventLabel.color = driftColor;
-            
+
             Debug.Log(x);
-        }else if(x == 1){
+        }
+        else if (x == 1)
+        {
             eventLabel.text = "RACE EVENT";
             eventLabel.color = raceColor;
             Debug.Log(x);
-        }else if(x == 2){
+        }
+        else if (x == 2)
+        {
             eventLabel.text = "DRAG EVENT";
             eventLabel.color = dragColor;
             Debug.Log(x);
         }
     }
 
-    IEnumerator countDown(){
+    IEnumerator countDown()
+    {
         rb.isKinematic = true;
-        for(int i = 0; i < initAnimation.Length; i++) {
-            if(i != 0){
+        for (int i = 0; i < initAnimation.Length; i++)
+        {
+            if (i != 0)
+            {
                 yield return new WaitForSeconds(2f);
             }
             initAnimation[i].Play();
@@ -205,7 +245,8 @@ public class ComboDisplay : MonoBehaviour {
         rb.isKinematic = false;
     }
 
-    public void endEvent(){
+    public void endEvent()
+    {
         runTimer = false;
         t = 0f;
         eventScore += Score_;
@@ -214,8 +255,10 @@ public class ComboDisplay : MonoBehaviour {
         StartCoroutine(endSequence());
     }
 
-    IEnumerator endSequence(){
-        if(ghost != null){
+    IEnumerator endSequence()
+    {
+        if (ghost != null)
+        {
             ghost.isRecord = false;
         }
         scoreCard.SetActive(true);
@@ -226,46 +269,55 @@ public class ComboDisplay : MonoBehaviour {
         scoreCard.SetActive(false);
     }
 
-    IEnumerator displayStars(float _score){
-        foreach(GameObject obj in stars) {
+    IEnumerator displayStars(float _score)
+    {
+        foreach (GameObject obj in stars)
+        {
             obj.SetActive(false);
         }
         Debug.Log("displayStars: " + _score);
-        for(int i = 0; i < starValues.Length; i++) {
-            if(_score >= starValues[i]){
+        for (int i = 0; i < starValues.Length; i++)
+        {
+            if (_score >= starValues[i])
+            {
                 stars[i].SetActive(true);
             }
             yield return new WaitForSeconds(1f);
         }
     }
-    
-    private void LateUpdate() {
+
+    private void LateUpdate()
+    {
         acceleration = (rb.linearVelocity - lastVelocity) / Time.fixedDeltaTime;
         lastVelocity = rb.linearVelocity;
-        if(acceleration.magnitude > 500f){
+        if (Mathf.Abs(acceleration.z) > 200f || Mathf.Abs(acceleration.x) > 200f)
+        {
             ShowDisplay = false;
             comboMeter.fillAmount = 0f;
-            Multiplier = 1f;
-            if(Score_ > 20f){
+            if (Score_ > 20f)
+            {
                 MTC.gameObject.SetActive(true);
-                MTC.setText("Combo Failed! Points: " + (Score * Multiplier).ToString());
+                MTC.setText("Combo Failed! Points: " + Mathf.Round(Score * Multiplier).ToString());
                 Score_ = 0f;
             }
+            Multiplier = 1f;
             Score = 0f;
         }
-
-        if(Time.timeScale < 0.1f){
+        if (Time.timeScale < 0.1f)
+        {
             displayObject.SetActive(false);
         }
 
-        if(runTimer){
+        if (runTimer)
+        {
             t += Time.deltaTime;
             TimeSpan timeSpan = TimeSpan.FromSeconds(t);
             timerLabel.text = timeSpan.ToString(@"mm\:ss\:ff");
         }
     }
 
-    public void photoModeState() {
+    public void photoModeState()
+    {
         Debug.Log(photoMode);
         photoMode = !photoMode;
     }

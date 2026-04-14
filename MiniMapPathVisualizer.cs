@@ -24,7 +24,9 @@ public class MiniMapPathVisualizer : MonoBehaviour
 
         if (targetTransform != null)
         {
-            if (destination == null) destination = Instantiate(destinationPrefab, targetTransform.position, destinationPrefab.transform.rotation);
+            Destroy(destination);
+            destination = Instantiate(destinationPrefab, targetTransform.position, destinationPrefab.transform.rotation);
+
             if (NavMesh.SamplePosition(transform.position, out NavMeshHit startHit, 50f, NavMesh.AllAreas) &&
                 NavMesh.SamplePosition(targetTransform.position, out NavMeshHit endHit, 50f, NavMesh.AllAreas))
             {

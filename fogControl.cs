@@ -52,6 +52,7 @@ public class fogControl : MonoBehaviour
 
     float bias;
     [SerializeField] private float maxExposure = .8f;
+    bool raining = false;
     private void Update()
     {
         density = Mathf.Clamp(density, minDensityValue, maxDensityValue);
@@ -60,10 +61,11 @@ public class fogControl : MonoBehaviour
         skyboxMaterial.SetFloat("_Exposure", Mathf.Clamp(bias * maxExposure, 0.39f, maxExposure));
         skyboxMaterial.SetColor("_Tint", Color.Lerp(minTintColor, maxTintColor, tintCurve.Evaluate(bias)));
         skyboxMaterial.SetFloat("_FogIntens", bias);
-        directionalLight.intensity = Mathf.Lerp(2.4f, .49f, tintCurve.Evaluate(bias));
+        directionalLight.intensity = Mathf.Lerp(2.4f, .19f, tintCurve.Evaluate(bias));
         var emission = rainParticleSystem.emission;
         if (RenderSettings.fogDensity > (minDensityValue + maxDensityValue) / 2)
         {
+            raining = true;
             emission.rateOverTime = Mathf.Lerp(emission.rateOverTime.constant, 80000f * density, Time.deltaTime * 0.1f);
             foreach (Material m in roadMaterial)
             {
@@ -72,6 +74,7 @@ public class fogControl : MonoBehaviour
         }
         else
         {
+            raining = false;
             emission.rateOverTime = Mathf.Lerp(emission.rateOverTime.constant, 0f, Time.deltaTime * 0.5f);
             foreach (Material m in roadMaterial)
             {
@@ -88,7 +91,14 @@ public class fogControl : MonoBehaviour
         t += Time.deltaTime;
         if (t > tempTimeInterval && shouldChange < 3)
         {
-            shouldChange = Random.Range(0, 10);
+            if (raining)
+            {
+                shouldChange = Random.Range(0, 5);
+            }
+            else
+            {
+                shouldChange = Random.Range(0, 10);
+            }
             density = Random.Range(minDensityValue, maxDensityValue);
             t = 0f;
 

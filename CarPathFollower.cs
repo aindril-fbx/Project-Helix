@@ -3,6 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Audio;
 
+class difficulty
+{
+    public float motorF;
+    public float speedLim;
+    public difficulty(float x, float y)
+    {
+        motorF = x;
+        speedLim = y;
+    }
+};
+
 public class CarPathFollower : MonoBehaviour
 {
     Transform[] path;
@@ -13,7 +24,8 @@ public class CarPathFollower : MonoBehaviour
     [SerializeField] private float accelDot;
 
     public bool travel = true;
-    [SerializeField] private float distanceBias = 15f; // distance from target to change target
+    [SerializeField] private float distanceBiasMax = 15f; // distance from target to change target
+    float distanceBias;
 
     [SerializeField] private Transform[] rays;
 
@@ -30,11 +42,27 @@ public class CarPathFollower : MonoBehaviour
 
     public bool loop = false;
 
-    [SerializeField] private bool racer = false;
+    [SerializeField] private readonly bool racer = false;
     [SerializeField] private float boostRatio = 0f;
 
     [Header("Audio")]
     [SerializeField] private AudioSource honkSound;
+
+    [SerializeField] private difficulty easy = new difficulty(80, 80);
+    [SerializeField] private difficulty medium = new difficulty(120, 90);
+    [SerializeField] private difficulty hard = new difficulty(150, 100);
+    [SerializeField] private difficulty extreme = new difficulty(150, 120);
+
+    private enum CurrentDifficulty
+    {
+        EASY,
+        MEDIUM,
+        HARD,
+        EXTREME,
+    };
+
+    [SerializeField] private CurrentDifficulty currentDifficulty = CurrentDifficulty.EASY;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -46,6 +74,7 @@ public class CarPathFollower : MonoBehaviour
         {
             targetPosition = path[0].transform;
         }
+        setDifficulty();
 
     }
     float distanceFromTarget;
@@ -56,11 +85,42 @@ public class CarPathFollower : MonoBehaviour
     float honkInterval = 0f;
     float honkDelay = 5f;
     bool canHonk = true;
+
+    void setDifficulty()
+    {
+        if (!racer) return;
+        switch (currentDifficulty)
+        {
+            case CurrentDifficulty.EASY:
+                motorForce = easy.motorF;
+                speedLimit = easy.speedLim;
+                break;
+            case CurrentDifficulty.MEDIUM:
+                motorForce = medium.motorF;
+                speedLimit = medium.speedLim;
+                break;
+            case CurrentDifficulty.HARD:
+                motorForce = hard.motorF;
+                speedLimit = hard.speedLim;
+                break;
+            case CurrentDifficulty.EXTREME:
+                motorForce = extreme.motorF;
+                speedLimit = extreme.speedLim;
+                break;
+        }
+        ;
+        distanceBias = distanceBiasMax * Mathf.Abs(accelDot + 0.5f) * (speedLimit / 200f);
+        //Debug.Log("AI Racer Difficulty Set!");
+    }
+    Vector3 directionVector;
     private void FixedUpdate()
     {
-        if(honkInterval < honkDelay){
+        if (honkInterval < honkDelay)
+        {
             honkInterval += Time.deltaTime;
-        }else{
+        }
+        else
+        {
             honkInterval = 0;
             canHonk = true;
         }
@@ -73,9 +133,9 @@ public class CarPathFollower : MonoBehaviour
                 correctRotation = true;
             }
         }
-        
+
         float distance = Vector3.Distance(targetPosition.position, transform.position);
-        if (distance < Mathf.Clamp(distanceBias * currentSpud/tempSpeedLimit, 0f, distanceBias))
+        if (distance < Mathf.Clamp(distanceBias * currentSpud / tempSpeedLimit, 0f, distanceBias))
         {
             t = 0f;
             if (loop && indexOfTransform(targetPosition) == path.Length - 2)
@@ -96,11 +156,14 @@ public class CarPathFollower : MonoBehaviour
 
                 }
             }
-        }else{
+        }
+        else
+        {
             t += Time.deltaTime;
         }
         float dotBetween = Vector3.Dot((path[indexOfTransform(targetPosition) + 1].position - targetPosition.position).normalized, transform.forward);
-        if(dotBetween < 0.5f){
+        if (dotBetween < 0.5f)
+        {
             rb.AddForce(rb.linearVelocity * -10f);
         }
         tempSpeedLimit = Mathf.Clamp(dotBetween * speedLimit, 15f, speedLimit);
@@ -108,7 +171,7 @@ public class CarPathFollower : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-        Vector3 directionVector = (targetPosition.position - transform.position).normalized;
+        directionVector = (targetPosition.position - transform.position).normalized;
         accelDot = Vector3.Dot(directionVector, transform.forward);
         steerDot = Vector3.Dot(directionVector, transform.right);
 
@@ -116,7 +179,7 @@ public class CarPathFollower : MonoBehaviour
         if (targetPosition != null && travel)
         {
             applyTorque(accelDot);
-            if(!rayHit) steerWheels(steerDot);
+            if (!rayHit) steerWheels(steerDot);
         }
         else
         {
@@ -147,7 +210,8 @@ public class CarPathFollower : MonoBehaviour
             downforce(dotBetween);
         }
 
-        if((carNear == false || Car == null) && (correctRotation && racer && t > 5f)){
+        if ((carNear == false || Car == null) && (correctRotation && racer && t > 5f))
+        {
             transform.rotation = targetPosition.rotation;
             correctRotation = false;
             transform.position = targetPosition.position + offsetPosition;
@@ -160,33 +224,52 @@ public class CarPathFollower : MonoBehaviour
             transform.rotation = targetPosition.rotation;
         }
 
+        CurrentDifficulty cd = CurrentDifficulty.EASY;
+        if (cd != currentDifficulty)
+        {
+            setDifficulty();
+        }
+        cd = currentDifficulty;
     }
 
     void downforce(float x)
     {
-        rb.AddForce(-transform.up * Mathf.Clamp(50f * currentSpud * currentSpud * (1f - Mathf.Abs(x)),0f,20000f));
+        rb.AddForce(-transform.up * Mathf.Clamp(50f * currentSpud * currentSpud * (1f - Mathf.Abs(x)), 0f, 13000f));
         //Debug.Log(-transform.up * 50f * currentSpud * currentSpud * (1f - Mathf.Abs(x)));
     }
 
     void applyTorque(float Throttle)
     {
-        rb.AddForce(transform.forward * 1000f * Mathf.Clamp(tempSpeedLimit-currentSpud, -1f,1f) * boostRatio);
+        rb.AddForce(directionVector * 1000f * Mathf.Clamp(tempSpeedLimit - currentSpud, -1f, 1f) * boostRatio);
         if (currentSpud < tempSpeedLimit)
-        {   
+        {
             foreach (WheelCollider w in m_WheelColliders)
             {
                 w.brakeTorque = 0f;
-                w.motorTorque = motorForce * 5f * Throttle * maxThrottleValue;
+                w.motorTorque = motorForce * 8f * Throttle * maxThrottleValue;
             }
         }
         else
         {
-            handBrake(true && !racer);
+            //handBrake(true && !racer);
             foreach (WheelCollider w in m_WheelColliders)
             {
                 w.brakeTorque = motorForce * 10f * Mathf.Abs(Throttle) * maxThrottleValue;
             }
-
+        }
+        if (currentSpud > speedLimit * (1f - Mathf.Abs(steerDot)))
+        {
+            foreach (WheelCollider w in m_WheelColliders)
+            {
+                w.brakeTorque = 100f;
+            }
+        }
+        else
+        {
+            foreach (WheelCollider w in m_WheelColliders)
+            {
+                w.brakeTorque = 0f;
+            }
         }
     }
 
@@ -220,19 +303,21 @@ public class CarPathFollower : MonoBehaviour
                 break;
             case 1:
                 handBrake(true && !racer);
-                if(canHonk){
+                if (canHonk)
+                {
                     honkInterval = 0f;
                     canHonk = false;
-                    if(!honkSound.isPlaying && !racer) honkSound.Play();
+                    if (!honkSound.isPlaying && !racer) honkSound.Play();
                 }
                 steerWheels(steerDot + 0.7f);
                 break;
             case 2:
                 handBrake(true && !racer);
-                if(canHonk){
+                if (canHonk)
+                {
                     honkInterval = 0f;
                     canHonk = false;
-                    if(!honkSound.isPlaying && !racer) honkSound.Play();
+                    if (!honkSound.isPlaying && !racer) honkSound.Play();
                 }
                 steerWheels(steerDot - 0.7f);
                 break;
@@ -256,10 +341,11 @@ public class CarPathFollower : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if(canHonk){
+        if (canHonk)
+        {
             honkInterval = 0f;
             canHonk = false;
-            if(!honkSound.isPlaying && !racer) honkSound.Play();
+            if (!honkSound.isPlaying && !racer) honkSound.Play();
         }
         //pathEnded = true;
         //travel = false;
@@ -278,7 +364,7 @@ public class CarPathFollower : MonoBehaviour
     float m_OldRotation;
     [SerializeField] private float m_SteerHelper = 0.7f;
     [SerializeField] private float steerHelpCoe = 0.5f;
-    
+
 
     private void SteerHelper()
     {
@@ -288,7 +374,7 @@ public class CarPathFollower : MonoBehaviour
             WheelHit wheelhit;
             m_WheelColliders[i].GetGroundHit(out wheelhit);
             if (wheelhit.normal == Vector3.zero)
-                return; 
+                return;
         }
 
         if (Mathf.Abs(m_OldRotation - transform.eulerAngles.y) < 10f)

@@ -13,7 +13,7 @@ public class TyreTempDisplay : MonoBehaviour
     [SerializeField] private GameObject tempUI;
     [SerializeField] private GameObject SpeedDisplay;
     [SerializeField] private GameObject Driftangle;
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,8 +28,8 @@ public class TyreTempDisplay : MonoBehaviour
         }else{
             tempUI.SetActive(false);
         }
-        SpeedDisplay.SetActive(IM.showSpeed ? true : false);
         if(Time.timeScale > 0.1f){
+            SpeedDisplay.SetActive(IM.showSpeed ? true : false);
             Driftangle.SetActive(IM.showAngle ? true : false);
         }else{
             Driftangle.SetActive(false);

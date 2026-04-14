@@ -164,15 +164,15 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(EngineSound.isPlaying == false)
+        if (EngineSound.isPlaying == false)
         {
             EngineSound.Play();
         }
-        if(BackFireSound.isPlaying == false)
+        if (BackFireSound.isPlaying == false)
         {
             BackFireSound.Play();
         }
-        if(brakeSound.isPlaying == false)
+        if (brakeSound.isPlaying == false)
         {
             brakeSound.Play();
         }
@@ -330,7 +330,9 @@ public class CarController : MonoBehaviour
                 if (i < 2)
                 {
                     brakeMeshes[i].material.SetColor("_EmissionColor", Mathf.Clamp(increaseTemp, 0f, 6f) * brakeColor);
-                }else{
+                }
+                else
+                {
                     brakeMeshes[i].material.SetColor("_EmissionColor", Mathf.Clamp(increaseTemp * 0.1f, 0f, 6f) * brakeColor);
                 }
             }
@@ -378,7 +380,7 @@ public class CarController : MonoBehaviour
         float breakCoeff = localVelocity * IM.Throttle;
         float breakForce = IM.HandBrake ? breakForcelol : 0f;
 
-        float driftBoost = Mathf.Clamp((1f-Mathf.Abs(Vector3.Dot(rb.linearVelocity.normalized, transform.forward))) * 4f, 1f, 2f);
+        float driftBoost = Mathf.Clamp((1f - Mathf.Abs(Vector3.Dot(rb.linearVelocity.normalized, transform.forward))) * 4f, 1f, 2f);
         if (AWD)
         {
             if (currentSpud * IM.Throttle > -0.2f)
@@ -460,7 +462,7 @@ public class CarController : MonoBehaviour
             m_WheelColliders[0].brakeTorque = 0f;
             m_WheelColliders[1].brakeTorque = 0f;
         }
-        
+
         m_WheelColliders[3].brakeTorque = breakForce;
         m_WheelColliders[2].brakeTorque = breakForce;
 
@@ -475,7 +477,8 @@ public class CarController : MonoBehaviour
                 w.mass = 50f;
             }
         }
-        if(currentSpud < 5f && currentSpud > -5f && !IM.HandBrake && Mathf.Abs(IM.ThrottleValue) < 0.2f){
+        if (currentSpud < 5f && currentSpud > -5f && !IM.HandBrake && Mathf.Abs(IM.ThrottleValue) < 0.2f)
+        {
             m_WheelColliders[3].brakeTorque = 100000f;
             m_WheelColliders[2].brakeTorque = 100000f;
         }
@@ -679,7 +682,7 @@ public class CarController : MonoBehaviour
     [SerializeField] private AnimationCurve RPMCurve;
     float load;
     float z;
-    
+
     private void CalculateRevs()
     {
         CalculateGearFactor();

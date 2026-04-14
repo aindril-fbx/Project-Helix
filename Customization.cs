@@ -5,7 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.Audio;
 using TMPro;
 
-public class Customization : MonoBehaviour {
+public class Customization : MonoBehaviour
+{
 
     [SerializeField] private GameObject ExitButton;
     [SerializeField] private GameObject BackButton;
@@ -45,7 +46,9 @@ public class Customization : MonoBehaviour {
     bool yes = false;
 
     [SerializeField] private bool Customizing_ = true;
-    [SerializeField] private enum customizationState{
+    [SerializeField]
+    private enum customizationState
+    {
         Customize,
         None,
         Upgrade
@@ -84,31 +87,37 @@ public class Customization : MonoBehaviour {
     [SerializeField] private GameObject[] themeImage;
     bool theme = false; // false is dark and true is light
 
-    private void Start() {
+    private void Start()
+    {
         OFFeffectSetPosition = partChangeEffect.position;
-        modeSelectUI.transform.LeanMoveLocal(new Vector2(0f,0f),0.2f).setEaseInQuart().setOnComplete(OnComplete).delay = 0.1f;
+        modeSelectUI.transform.LeanMoveLocal(new Vector2(0f, 0f), 0.2f).setEaseInQuart().setOnComplete(OnComplete).delay = 0.1f;
         upgradeWindow[currentItemType].SetActive(true);
         upgradeItemSlider.maxValue = (float)upgradeWindow.Length - 0.1f;
-        camAnimator.SetFloat("Blend",0.5f);
+        camAnimator.SetFloat("Blend", 0.5f);
         rotationSlider.value = 90f;
         AddListenertoButtons();
         moneyDisplay.text = playerStats.instance.playerMoney_().ToString("n0");
         SetCustomizationState(0);
 
-        bgMat.SetFloat("_Theme",0f);
-        themeButton.onClick.AddListener(()=> {
+        bgMat.SetFloat("_Theme", 0f);
+        themeButton.onClick.AddListener(() =>
+        {
             themeImage[0].SetActive(!themeImage[0].activeSelf);
             themeImage[1].SetActive(!themeImage[1].activeSelf);
             theme = !theme;
         });
     }
-    private void FixedUpdate() {
+    private void FixedUpdate()
+    {
         cs = CD.CS;
-        for(int i = 0; i < cs.wheelMesh.Length; i++) {
+        for (int i = 0; i < cs.wheelMesh.Length; i++)
+        {
             wheelRims[i] = cs.wheelMesh[i].materials[cs.Rims];
         }
-        if(cs.hasWheelSecondary){
-            for(int i = 0; i < cs.wheelMesh.Length; i++) {
+        if (cs.hasWheelSecondary)
+        {
+            for (int i = 0; i < cs.wheelMesh.Length; i++)
+            {
                 wheelSecondary[i] = cs.wheelMesh[i].materials[cs.RimSecondary];
             }
         }
@@ -116,38 +125,45 @@ public class Customization : MonoBehaviour {
         carMaterials[1] = cs.carBodyMesh.materials[cs.Secondary];
         carMaterials[2] = cs.wheelMesh[0].materials[cs.Rims];
 
-        if(theme){
-            bgMat.SetFloat("_Theme",Mathf.Lerp(bgMat.GetFloat("_Theme"),1f,0.1f));
-        }else{
-            bgMat.SetFloat("_Theme",Mathf.Lerp(bgMat.GetFloat("_Theme"),0f,0.1f));
+        if (theme)
+        {
+            bgMat.SetFloat("_Theme", Mathf.Lerp(bgMat.GetFloat("_Theme"), 1f, 0.1f));
+        }
+        else
+        {
+            bgMat.SetFloat("_Theme", Mathf.Lerp(bgMat.GetFloat("_Theme"), 0f, 0.1f));
         }
     }
 
-    private void Update() {
-        switch (CState){
+    private void Update()
+    {
+        switch (CState)
+        {
             case customizationState.None:
                 ExitButton.SetActive(true);
                 BackButton.SetActive(false);
-                camAnimator.SetFloat("Blend",Mathf.Lerp(camAnimator.GetFloat("Blend"),0.5f,0.1f));
-                rotationSlider.value = Mathf.Lerp(rotationSlider.value,90f,0.1f);
+                camAnimator.SetFloat("Blend", Mathf.Lerp(camAnimator.GetFloat("Blend"), 0.5f, 0.1f));
+                rotationSlider.value = Mathf.Lerp(rotationSlider.value, 90f, 0.1f);
                 break;
             case customizationState.Customize:
                 ExitButton.SetActive(false);
                 BackButton.SetActive(true);
-                camAnimator.SetFloat("Blend",Mathf.Lerp(camAnimator.GetFloat("Blend"),0f,0.1f));
+                camAnimator.SetFloat("Blend", Mathf.Lerp(camAnimator.GetFloat("Blend"), 0f, 0.1f));
                 break;
             case customizationState.Upgrade:
                 ExitButton.SetActive(false);
                 BackButton.SetActive(true);
-                camAnimator.SetFloat("Blend",Mathf.Lerp(camAnimator.GetFloat("Blend"),1f,0.1f));
-                rotationSlider.value = Mathf.Lerp(rotationSlider.value,137f,0.2f);
+                camAnimator.SetFloat("Blend", Mathf.Lerp(camAnimator.GetFloat("Blend"), 1f, 0.1f));
+                rotationSlider.value = Mathf.Lerp(rotationSlider.value, 137f, 0.2f);
                 break;
         }
     }
 
-    public void ChangeValue() {
+    public void ChangeValue()
+    {
         cs.updateMaterials = true;
-        if(yes){
+        if (yes)
+        {
 
             HSVvalues[0] = hueSlider.value;
             HSVvalues[1] = saturationSlider.value;
@@ -162,9 +178,12 @@ public class Customization : MonoBehaviour {
             carMaterials[currentMaterial].SetFloat("_Smoothness", glossySlider.value);
             carMaterials[currentMaterial].SetFloat("_Metallic", metallicSlider.value);
 
-            if(cs.hasWheelSecondary){
-                if(currentMaterial == 1){
-                    foreach(Material m in wheelSecondary) {
+            if (cs.hasWheelSecondary)
+            {
+                if (currentMaterial == 1)
+                {
+                    foreach (Material m in wheelSecondary)
+                    {
                         m.SetColor("_BaseColor", RGB);
                         m.SetFloat("_Smoothness", glossySlider.value);
                         m.SetFloat("_Metallic", metallicSlider.value);
@@ -172,19 +191,24 @@ public class Customization : MonoBehaviour {
                 }
             }
 
-            if(currentMaterial == 2){
-                foreach(Material m in wheelRims) {
+            if (currentMaterial == 2)
+            {
+                foreach (Material m in wheelRims)
+                {
                     m.SetColor("_BaseColor", RGB);
                     m.SetFloat("_Smoothness", glossySlider.value);
                     m.SetFloat("_Metallic", metallicSlider.value);
                 }
             }
 
-            if(cs.spoilerMesh != null && currentMaterial == 0){
+            if (cs.spoilerMesh != null && currentMaterial == 0)
+            {
                 cs.spoilerMesh.materials[0].SetColor("_BaseColor", RGB);
                 cs.spoilerMesh.materials[0].SetFloat("_Smoothness", glossySlider.value);
                 cs.spoilerMesh.materials[0].SetFloat("_Metallic", metallicSlider.value);
-            }else if(currentMaterial == 1 && cs.Primary == cs.Secondary && cs.spoilerMesh != null){
+            }
+            else if (currentMaterial == 1 && cs.Primary == cs.Secondary && cs.spoilerMesh != null)
+            {
                 cs.spoilerMesh.materials[0].SetColor("_BaseColor", RGB);
                 cs.spoilerMesh.materials[0].SetFloat("_Smoothness", glossySlider.value);
                 cs.spoilerMesh.materials[0].SetFloat("_Metallic", metallicSlider.value);
@@ -194,11 +218,12 @@ public class Customization : MonoBehaviour {
 
     }
 
-    public void ChangeHexValue(){
-        Color hexColor;
-        float H,S,V;
-        if(ColorUtility.TryParseHtmlString("#" + HexCodeDisplay.text, out hexColor)){
-            Color.RGBToHSV(hexColor, out H,out S,out V);
+    public void ChangeHexValue()
+    {
+        float H, S, V;
+        if (ColorUtility.TryParseHtmlString("#" + HexCodeDisplay.text, out Color hexColor))
+        {
+            Color.RGBToHSV(hexColor, out H, out S, out V);
             hueSlider.value = H;
             saturationSlider.value = S;
             valueSlider.value = V;
@@ -206,8 +231,10 @@ public class Customization : MonoBehaviour {
 
     }
 
-    public void changeRideHeight(){
-        if(yes){
+    public void changeRideHeight()
+    {
+        if (yes)
+        {
             cs.susHeightsAdder[0] = frontWheelSlider.value;
             cs.susHeightsAdder[1] = frontWheelSlider.value;
             cs.susHeightsAdder[2] = rearWheelSlider.value;
@@ -215,14 +242,16 @@ public class Customization : MonoBehaviour {
         }
     }
 
-    public void ChangeMaterialIndex(int x) {
+    public void ChangeMaterialIndex(int x)
+    {
         currentMaterial = x;
     }
 
-    public void OnComplete() {
+    public void OnComplete()
+    {
         yes = false;
         RGB = carMaterials[currentMaterial].GetColor("_BaseColor");
-        float H,S,V;
+        float H, S, V;
         Color.RGBToHSV(RGB, out H, out S, out V);
 
         hueSlider.value = H;
@@ -236,28 +265,36 @@ public class Customization : MonoBehaviour {
         HexCodeDisplay.text = HexCode;
 
         UpdateValueLabels();
-        
 
-        for(int i = 0; i < cs.ownedBoost.Length; i++) {
-            if(cs.ownedBoost[i] == 1){
+
+        for (int i = 0; i < cs.ownedBoost.Length; i++)
+        {
+            if (cs.ownedBoost[i] == 1)
+            {
                 boostButtons[i].GetComponent<upgradeItemState>().SetStateToOwned();
             }
             boostButtons[cs.boost_type].GetComponent<upgradeItemState>().SetStateToInstalled();
         }
-        for(int i = 0; i < cs.ownedTyreCompound.Length; i++) {
-            if(cs.ownedTyreCompound[i] == 1){
+        for (int i = 0; i < cs.ownedTyreCompound.Length; i++)
+        {
+            if (cs.ownedTyreCompound[i] == 1)
+            {
                 tyreButtons[i].GetComponent<upgradeItemState>().SetStateToOwned();
             }
             tyreButtons[cs.tyreCompound].GetComponent<upgradeItemState>().SetStateToInstalled();
         }
-        for(int i = 0; i < cs.ownedSuspension.Length; i++) {
-            if(cs.ownedSuspension[i] == 1){
+        for (int i = 0; i < cs.ownedSuspension.Length; i++)
+        {
+            if (cs.ownedSuspension[i] == 1)
+            {
                 susButtons[i].GetComponent<upgradeItemState>().SetStateToOwned();
             }
             susButtons[cs.suspension].GetComponent<upgradeItemState>().SetStateToInstalled();
         }
-        for(int i = 0; i < cs.ownedWeightReduction.Length; i++) {
-            if(cs.ownedWeightReduction[i] == 1){
+        for (int i = 0; i < cs.ownedWeightReduction.Length; i++)
+        {
+            if (cs.ownedWeightReduction[i] == 1)
+            {
                 weightButtons[i].GetComponent<upgradeItemState>().SetStateToOwned();
             }
             weightButtons[cs.weightReduction].GetComponent<upgradeItemState>().SetStateToInstalled();
@@ -267,15 +304,20 @@ public class Customization : MonoBehaviour {
         yes = true;
     }
 
-    public void Save() {
+    public void Save()
+    {
         cs.SaveDataPls();
     }
 
-    void UpdateValueLabels(){
+    void UpdateValueLabels()
+    {
 
-        if(PlayerPrefs.GetInt("MetricUnit") == 0){
-            valueLabels[6].text = cs.calculateSpeed()*1.6f + " KMPH";
-        }else{
+        if (PlayerPrefs.GetInt("MetricUnit") == 0)
+        {
+            valueLabels[6].text = cs.calculateSpeed() * 1.6f + " KMPH";
+        }
+        else
+        {
             valueLabels[6].text = cs.calculateSpeed() + " MPH";
         }
         valueLabels[0].text = cs.CarName;
@@ -283,7 +325,7 @@ public class Customization : MonoBehaviour {
         valueLabels[2].text = cs.calculatePower() + "";
         valueLabels[3].text = cs.boost + " PS";
         valueLabels[4].text = cs.drivetype_;
-        valueLabels[5].text = cs.calculateWeight()*2.2f + " KG";
+        valueLabels[5].text = cs.calculateWeight() * 2.2f + " KG";
         valueLabels[7].text = tyreButtons[cs.tyreCompound].name;
 
     }
@@ -294,64 +336,79 @@ public class Customization : MonoBehaviour {
     int suspension;
     int tyreCompound;
 
-    void showcaseValueLabels(){
+    void showcaseValueLabels()
+    {
         valueLabels[2].text = cs.calculatePower() + "";
         valueLabels[3].text = cs.boost + " PS";
         valueLabels[4].text = cs.drivetype_;
-        valueLabels[5].text = cs.calculateWeight()*2.2f + " KG";
+        valueLabels[5].text = cs.calculateWeight() * 2.2f + " KG";
         valueLabels[7].text = tyreButtons[cs.tyreCompound].name;
     }
 
-    float calculatePower_Showcase(){ 
+    float calculatePower_Showcase()
+    {
         return 0f;
     }
 
-    float calculateSpeed_Showcase(){
+    float calculateSpeed_Showcase()
+    {
         return 0f;
     }
 
-    float calculateWeight_Showcase(){
+    float calculateWeight_Showcase()
+    {
         return 0f;
     }
 
-    public void SetCustomizationState(int x){
-        if(x == 0){
+    public void SetCustomizationState(int x)
+    {
+        if (x == 0)
+        {
             CState = customizationState.None;
             touchPanel.SetActive(false);
             Debug.Log("Initialize None State");
-            modeSelectUI.transform.LeanMoveLocal(new Vector2(0f,0f),0.2f).setEaseInQuart().delay = 0.2f;
-            UpgradeUI.transform.LeanMoveLocal(new Vector2(0f,-200f),0.2f).setEaseInQuart().setOnComplete(OnComplete);
-            CustomizationUI.transform.LeanMoveLocal(new Vector2(0f,-200f),0.2f).setEaseInQuart().setOnComplete(OnComplete);
-            CarStatsUI.transform.LeanMoveLocal(new Vector2(-2300f,22.718f),0.2f).setEaseInQuart();
+            modeSelectUI.transform.LeanMoveLocal(new Vector2(0f, 0f), 0.2f).setEaseInQuart().delay = 0.2f;
+            UpgradeUI.transform.LeanMoveLocal(new Vector2(0f, -200f), 0.2f).setEaseInQuart().setOnComplete(OnComplete);
+            CustomizationUI.transform.LeanMoveLocal(new Vector2(0f, -200f), 0.2f).setEaseInQuart().setOnComplete(OnComplete);
+            CarStatsUI.transform.LeanMoveLocal(new Vector2(-2300f, 22.718f), 0.2f).setEaseInQuart();
 
-        }else if(x == 1){
+        }
+        else if (x == 1)
+        {
             CState = customizationState.Customize;
             touchPanel.SetActive(true);
             Debug.Log("Initialize Customize");
-            ScreenHeader.transform.LeanMoveLocal(new Vector2(0f,0f),0.2f).setEaseInQuart();
-            modeSelectUI.transform.LeanMoveLocal(new Vector2(0f,-200f),0.2f).setEaseInQuart().setOnComplete(OnComplete);
-            UpgradeUI.transform.LeanMoveLocal(new Vector2(0f,-200f),0.2f).setEaseInQuart().setOnComplete(OnComplete);
-            CustomizationUI.transform.LeanMoveLocal(new Vector2(0f,0f),0.2f).setEaseInQuart().delay = 0.2f;
-            CarStatsUI.transform.LeanMoveLocal(new Vector2(-2300f,22.718f),0.2f).setEaseInQuart();
-        }else if(x == 2){
+            ScreenHeader.transform.LeanMoveLocal(new Vector2(0f, 0f), 0.2f).setEaseInQuart();
+            modeSelectUI.transform.LeanMoveLocal(new Vector2(0f, -200f), 0.2f).setEaseInQuart().setOnComplete(OnComplete);
+            UpgradeUI.transform.LeanMoveLocal(new Vector2(0f, -200f), 0.2f).setEaseInQuart().setOnComplete(OnComplete);
+            CustomizationUI.transform.LeanMoveLocal(new Vector2(0f, 0f), 0.2f).setEaseInQuart().delay = 0.2f;
+            CarStatsUI.transform.LeanMoveLocal(new Vector2(-2300f, 22.718f), 0.2f).setEaseInQuart();
+        }
+        else if (x == 2)
+        {
             CState = customizationState.Upgrade;
             touchPanel.SetActive(false);
             Debug.Log("Initialize Upgrade");
-            ScreenHeader.transform.LeanMoveLocal(new Vector2(0f,70.0829f),0.2f).setEaseInQuart();
-            modeSelectUI.transform.LeanMoveLocal(new Vector2(0f,-200f),0.2f).setEaseInQuart().setOnComplete(OnComplete);
-            CustomizationUI.transform.LeanMoveLocal(new Vector2(0f,-200f),0.2f).setEaseInQuart().setOnComplete(OnComplete);
-            UpgradeUI.transform.LeanMoveLocal(new Vector2(0f,0f),0.2f).setEaseInQuart().delay = 0.2f;
-            CarStatsUI.transform.LeanMoveLocal(new Vector2(-652f,22.718f),0.2f).setEaseInQuart();
+            ScreenHeader.transform.LeanMoveLocal(new Vector2(0f, 70.0829f), 0.2f).setEaseInQuart();
+            modeSelectUI.transform.LeanMoveLocal(new Vector2(0f, -200f), 0.2f).setEaseInQuart().setOnComplete(OnComplete);
+            CustomizationUI.transform.LeanMoveLocal(new Vector2(0f, -200f), 0.2f).setEaseInQuart().setOnComplete(OnComplete);
+            UpgradeUI.transform.LeanMoveLocal(new Vector2(0f, 0f), 0.2f).setEaseInQuart().delay = 0.2f;
+            CarStatsUI.transform.LeanMoveLocal(new Vector2(-652f, 22.718f), 0.2f).setEaseInQuart();
         }
     }
 
 
-    public void ChangeUpgradeWindow(){
-        for(int i = 0; i < upgradeWindow.Length; i++) {
-            if((int)upgradeItemSlider.value == i){
+    public void ChangeUpgradeWindow()
+    {
+        for (int i = 0; i < upgradeWindow.Length; i++)
+        {
+            if ((int)upgradeItemSlider.value == i)
+            {
                 upgradeWindow[i].SetActive(true);
                 upgradeLabel_Display.text = upgradeLabels[i];
-            }else{
+            }
+            else
+            {
                 upgradeWindow[i].SetActive(false);
             }
         }
@@ -363,27 +420,39 @@ public class Customization : MonoBehaviour {
     [SerializeField] private Button[] weightButtons;
     [SerializeField] private Color notSelectedColor;
     [SerializeField] private Color selectedColor;
-    void AddListenertoButtons(){
-        foreach(Button b in tyreButtons) {
-            b.onClick.AddListener(()=>{
-                for(int i = 0; i < tyreButtons.Length; i++) {
-                    if(tyreButtons[i] == b){
+    void AddListenertoButtons()
+    {
+        foreach (Button b in tyreButtons)
+        {
+            b.onClick.AddListener(() =>
+            {
+                for (int i = 0; i < tyreButtons.Length; i++)
+                {
+                    if (tyreButtons[i] == b)
+                    {
                         upgradeItemState UIS = tyreButtons[i].GetComponent<upgradeItemState>();
-                        Debug.Log("Tyre of Type: "+i);
+                        Debug.Log("Tyre of Type: " + i);
                         tyreButtons[i].gameObject.GetComponent<Shadow>().effectColor = selectedColor;
-                        if(UIS.selected){
-                            if(UIS.itemState == upgradeItemState.ItemState.NotOwned){
-                                BuyPart(0,i);
-                            }else{
-                            //UIS.changeItemState();
-                                if(UIS.itemState == upgradeItemState.ItemState.Owned){
-                                    changeInstalledPart(0,i);
+                        if (UIS.selected)
+                        {
+                            if (UIS.itemState == upgradeItemState.ItemState.NotOwned)
+                            {
+                                BuyPart(0, i);
+                            }
+                            else
+                            {
+                                //UIS.changeItemState();
+                                if (UIS.itemState == upgradeItemState.ItemState.Owned)
+                                {
+                                    changeInstalledPart(0, i);
                                 }
                             }
                         }
                         selectAudioSouce.Play();
                         UIS.selected = true;
-                    }else{
+                    }
+                    else
+                    {
                         tyreButtons[i].GetComponent<upgradeItemState>().selected = false;
                         tyreButtons[i].gameObject.GetComponent<Shadow>().effectColor = notSelectedColor;
                     }
@@ -391,26 +460,37 @@ public class Customization : MonoBehaviour {
             });
         }
 
-        foreach(Button b in boostButtons) {
-            b.onClick.AddListener(()=>{
-                for(int i = 0; i < boostButtons.Length; i++) {
-                    if(boostButtons[i] == b){
+        foreach (Button b in boostButtons)
+        {
+            b.onClick.AddListener(() =>
+            {
+                for (int i = 0; i < boostButtons.Length; i++)
+                {
+                    if (boostButtons[i] == b)
+                    {
                         upgradeItemState UIS = boostButtons[i].GetComponent<upgradeItemState>();
-                        Debug.Log("Boost of Type: "+i);
+                        Debug.Log("Boost of Type: " + i);
                         boostButtons[i].gameObject.GetComponent<Shadow>().effectColor = selectedColor;
-                        if(UIS.selected){
-                            if(UIS.itemState == upgradeItemState.ItemState.NotOwned){
-                                BuyPart(1,i);
-                            }else{
-                            //UIS.changeItemState();
-                                if(UIS.itemState == upgradeItemState.ItemState.Owned){
-                                    changeInstalledPart(1,i);
+                        if (UIS.selected)
+                        {
+                            if (UIS.itemState == upgradeItemState.ItemState.NotOwned)
+                            {
+                                BuyPart(1, i);
+                            }
+                            else
+                            {
+                                //UIS.changeItemState();
+                                if (UIS.itemState == upgradeItemState.ItemState.Owned)
+                                {
+                                    changeInstalledPart(1, i);
                                 }
                             }
                         }
                         selectAudioSouce.Play();
                         UIS.selected = true;
-                    }else{
+                    }
+                    else
+                    {
                         boostButtons[i].GetComponent<upgradeItemState>().selected = false;
                         boostButtons[i].gameObject.GetComponent<Shadow>().effectColor = notSelectedColor;
                     }
@@ -418,26 +498,37 @@ public class Customization : MonoBehaviour {
             });
         }
 
-        foreach(Button b in susButtons) {
-            b.onClick.AddListener(()=>{
-                for(int i = 0; i < susButtons.Length; i++) {
-                    if(susButtons[i] == b){
+        foreach (Button b in susButtons)
+        {
+            b.onClick.AddListener(() =>
+            {
+                for (int i = 0; i < susButtons.Length; i++)
+                {
+                    if (susButtons[i] == b)
+                    {
                         upgradeItemState UIS = susButtons[i].GetComponent<upgradeItemState>();
-                        Debug.Log("Suspension of Type: "+i);
+                        Debug.Log("Suspension of Type: " + i);
                         susButtons[i].gameObject.GetComponent<Shadow>().effectColor = selectedColor;
-                        if(UIS.selected){
-                            if(UIS.itemState == upgradeItemState.ItemState.NotOwned){
-                                BuyPart(2,i);
-                            }else{
-                            //UIS.changeItemState();
-                                if(UIS.itemState == upgradeItemState.ItemState.Owned){
-                                    changeInstalledPart(2,i);
+                        if (UIS.selected)
+                        {
+                            if (UIS.itemState == upgradeItemState.ItemState.NotOwned)
+                            {
+                                BuyPart(2, i);
+                            }
+                            else
+                            {
+                                //UIS.changeItemState();
+                                if (UIS.itemState == upgradeItemState.ItemState.Owned)
+                                {
+                                    changeInstalledPart(2, i);
                                 }
                             }
                         }
                         selectAudioSouce.Play();
                         UIS.selected = true;
-                    }else{
+                    }
+                    else
+                    {
                         susButtons[i].GetComponent<upgradeItemState>().selected = false;
                         susButtons[i].gameObject.GetComponent<Shadow>().effectColor = notSelectedColor;
                     }
@@ -445,26 +536,37 @@ public class Customization : MonoBehaviour {
             });
         }
 
-        foreach(Button b in weightButtons) {
-            b.onClick.AddListener(()=>{
-                for(int i = 0; i < weightButtons.Length; i++) {
-                    if(weightButtons[i] == b){
+        foreach (Button b in weightButtons)
+        {
+            b.onClick.AddListener(() =>
+            {
+                for (int i = 0; i < weightButtons.Length; i++)
+                {
+                    if (weightButtons[i] == b)
+                    {
                         upgradeItemState UIS = weightButtons[i].GetComponent<upgradeItemState>();
-                        Debug.Log("weight of Type: "+i);
+                        Debug.Log("weight of Type: " + i);
                         weightButtons[i].gameObject.GetComponent<Shadow>().effectColor = selectedColor;
-                        if(UIS.selected){
-                            if(UIS.itemState == upgradeItemState.ItemState.NotOwned){
-                                BuyPart(3,i);
-                            }else{
-                            //UIS.changeItemState();
-                                if(UIS.itemState == upgradeItemState.ItemState.Owned){
-                                    changeInstalledPart(3,i);
+                        if (UIS.selected)
+                        {
+                            if (UIS.itemState == upgradeItemState.ItemState.NotOwned)
+                            {
+                                BuyPart(3, i);
+                            }
+                            else
+                            {
+                                //UIS.changeItemState();
+                                if (UIS.itemState == upgradeItemState.ItemState.Owned)
+                                {
+                                    changeInstalledPart(3, i);
                                 }
                             }
                         }
                         selectAudioSouce.Play();
                         UIS.selected = true;
-                    }else{
+                    }
+                    else
+                    {
                         weightButtons[i].GetComponent<upgradeItemState>().selected = false;
                         weightButtons[i].gameObject.GetComponent<Shadow>().effectColor = notSelectedColor;
                     }
@@ -472,72 +574,89 @@ public class Customization : MonoBehaviour {
             });
         }
     }
-    
-    public void Deselect(){
-        foreach(Button b in susButtons){
+
+    public void Deselect()
+    {
+        foreach (Button b in susButtons)
+        {
             b.GetComponent<upgradeItemState>().selected = false;
             b.gameObject.GetComponent<Shadow>().effectColor = notSelectedColor;
         }
-        foreach(Button b in tyreButtons){
+        foreach (Button b in tyreButtons)
+        {
             b.GetComponent<upgradeItemState>().selected = false;
             b.gameObject.GetComponent<Shadow>().effectColor = notSelectedColor;
         }
-        foreach(Button b in boostButtons){
+        foreach (Button b in boostButtons)
+        {
             b.GetComponent<upgradeItemState>().selected = false;
             b.gameObject.GetComponent<Shadow>().effectColor = notSelectedColor;
         }
-        foreach(Button b in weightButtons){
+        foreach (Button b in weightButtons)
+        {
             b.GetComponent<upgradeItemState>().selected = false;
             b.gameObject.GetComponent<Shadow>().effectColor = notSelectedColor;
         }
     }
 
-    void BuyPart(int partOfType, int partId) {
+    void BuyPart(int partOfType, int partId)
+    {
         bool transaction = false;
         buyPartScreen.SetActive(true);
-        buyButton.onClick.AddListener(()=>{
-            if(!transaction) {
+        buyButton.onClick.AddListener(() =>
+        {
+            if (!transaction)
+            {
                 Debug.Log("Brought Item of Type: " + partOfType + " of ID: " + partId);
                 buyPartScreen.SetActive(false);
-                if(partOfType == 0) {
+                if (partOfType == 0)
+                {
                     tyreButtons[partId].GetComponent<upgradeItemState>().changeItemState();
                     playerStats.instance.transaction(-tyreButtons[partId].GetComponent<upgradeItemState>().getPrice());
                     cs.ownedTyreCompound[partId] = 1;
                     Save();
                     moneyChangeDisplay.text = (-tyreButtons[partId].GetComponent<upgradeItemState>().getPrice()).ToString("n0");
                     moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().alpha = 1f;
-                    moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().LeanAlpha(0f,0.5f).setEaseInQuart().delay = 1f;
-                }else if(partOfType == 1){
+                    moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().LeanAlpha(0f, 0.5f).setEaseInQuart().delay = 1f;
+                }
+                else if (partOfType == 1)
+                {
                     boostButtons[partId].GetComponent<upgradeItemState>().changeItemState();
                     playerStats.instance.transaction(-boostButtons[partId].GetComponent<upgradeItemState>().getPrice());
                     cs.ownedBoost[partId] = 1;
                     Save();
                     moneyChangeDisplay.text = (-boostButtons[partId].GetComponent<upgradeItemState>().getPrice()).ToString("n0");
                     moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().alpha = 1f;
-                    moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().LeanAlpha(0f,0.5f).setEaseInQuart().delay = 1f;
-                }else if(partOfType == 2){
+                    moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().LeanAlpha(0f, 0.5f).setEaseInQuart().delay = 1f;
+                }
+                else if (partOfType == 2)
+                {
                     susButtons[partId].GetComponent<upgradeItemState>().changeItemState();
                     playerStats.instance.transaction(-susButtons[partId].GetComponent<upgradeItemState>().getPrice());
                     cs.ownedSuspension[partId] = 1;
                     Save();
                     moneyChangeDisplay.text = (-susButtons[partId].GetComponent<upgradeItemState>().getPrice()).ToString("n0");
                     moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().alpha = 1f;
-                    moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().LeanAlpha(0f,0.5f).setEaseInQuart().delay = 1f;
-                }else if(partOfType == 3){
+                    moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().LeanAlpha(0f, 0.5f).setEaseInQuart().delay = 1f;
+                }
+                else if (partOfType == 3)
+                {
                     weightButtons[partId].GetComponent<upgradeItemState>().changeItemState();
                     playerStats.instance.transaction(-susButtons[partId].GetComponent<upgradeItemState>().getPrice());
                     cs.ownedWeightReduction[partId] = 1;
                     Save();
                     moneyChangeDisplay.text = (-susButtons[partId].GetComponent<upgradeItemState>().getPrice()).ToString("n0");
                     moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().alpha = 1f;
-                    moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().LeanAlpha(0f,0.5f).setEaseInQuart().delay = 1f;
+                    moneyChangeDisplay.transform.parent.gameObject.GetComponent<CanvasGroup>().LeanAlpha(0f, 0.5f).setEaseInQuart().delay = 1f;
                 }
                 moneyDisplay.text = playerStats.instance.playerMoney_().ToString("n0");
                 transaction = true;
             }
         });
-        cancelButton.onClick.AddListener(()=>{
-            if(!transaction) {
+        cancelButton.onClick.AddListener(() =>
+        {
+            if (!transaction)
+            {
                 Debug.Log("Canceled buy process");
                 buyPartScreen.SetActive(false);
                 transaction = true;
@@ -546,67 +665,99 @@ public class Customization : MonoBehaviour {
         });
     }
 
-    void changeInstalledPart(int partOfType, int partId) {
+    void changeInstalledPart(int partOfType, int partId)
+    {
         installAudioSource.Play();
         LeanTween.cancel(partChangeEffect.gameObject);
         effectComplete();
-        partChangeEffect.LeanMoveLocal(ONeffectSetPosition,2f).setEaseOutQuart().setOnComplete(effectComplete);
-        if(partOfType == 0) {
-            for(int i = 0; i < tyreButtons.Length; i++) {
+        partChangeEffect.LeanMoveLocal(ONeffectSetPosition, 2f).setEaseOutQuart().setOnComplete(effectComplete);
+        if (partOfType == 0)
+        {
+            for (int i = 0; i < tyreButtons.Length; i++)
+            {
                 upgradeItemState UIS = tyreButtons[i].GetComponent<upgradeItemState>();
-                if(i == partId){
-                    if(UIS.itemState == upgradeItemState.ItemState.Owned){
+                if (i == partId)
+                {
+                    if (UIS.itemState == upgradeItemState.ItemState.Owned)
+                    {
                         cs.tyreCompound = partId;
                         cs.SaveDataPls();
                         UIS.SetStateToInstalled();
                     }
-                }else{
-                    if(UIS.itemState == upgradeItemState.ItemState.Installed){
+                }
+                else
+                {
+                    if (UIS.itemState == upgradeItemState.ItemState.Installed)
+                    {
                         UIS.SetStateToOwned();
                     }
                 }
             }
-        }else if(partOfType == 1){
-            for(int i = 0; i < boostButtons.Length; i++) {
+        }
+        else if (partOfType == 1)
+        {
+            for (int i = 0; i < boostButtons.Length; i++)
+            {
                 upgradeItemState UIS = boostButtons[i].GetComponent<upgradeItemState>();
-                if(i == partId){
-                    if(UIS.itemState == upgradeItemState.ItemState.Owned){
+                if (i == partId)
+                {
+                    if (UIS.itemState == upgradeItemState.ItemState.Owned)
+                    {
                         cs.boost_type = partId;
                         cs.SaveDataPls();
                         UIS.SetStateToInstalled();
                     }
-                }else{
-                    if(UIS.itemState == upgradeItemState.ItemState.Installed){
+                }
+                else
+                {
+                    if (UIS.itemState == upgradeItemState.ItemState.Installed)
+                    {
                         UIS.SetStateToOwned();
                     }
                 }
             }
-        }else if(partOfType == 2){
-            for(int i = 0; i < susButtons.Length; i++) {
+        }
+        else if (partOfType == 2)
+        {
+            for (int i = 0; i < susButtons.Length; i++)
+            {
                 upgradeItemState UIS = susButtons[i].GetComponent<upgradeItemState>();
-                if(i == partId){
-                    if(UIS.itemState == upgradeItemState.ItemState.Owned){
+                if (i == partId)
+                {
+                    if (UIS.itemState == upgradeItemState.ItemState.Owned)
+                    {
                         cs.suspension = partId;
                         cs.SaveDataPls();
                         UIS.SetStateToInstalled();
                     }
-                }else{
-                    if(UIS.itemState == upgradeItemState.ItemState.Installed){
+                }
+                else
+                {
+                    if (UIS.itemState == upgradeItemState.ItemState.Installed)
+                    {
                         UIS.SetStateToOwned();
                     }
                 }
             }
-        }else if(partOfType == 3){
-            for(int i = 0; i < weightButtons.Length; i++) {
+        }
+        else if (partOfType == 3)
+        {
+            for (int i = 0; i < weightButtons.Length; i++)
+            {
                 upgradeItemState UIS = weightButtons[i].GetComponent<upgradeItemState>();
-                if(i == partId){
-                    if(UIS.itemState == upgradeItemState.ItemState.Owned){
+                if (i == partId)
+                {
+                    if (UIS.itemState == upgradeItemState.ItemState.Owned)
+                    {
                         cs.weightReduction = partId;
                         cs.SaveDataPls();
                         UIS.SetStateToInstalled();
                     }
-                }else{
-                    if(UIS.itemState == upgradeItemState.ItemState.Installed){
+                }
+                else
+                {
+                    if (UIS.itemState == upgradeItemState.ItemState.Installed)
+                    {
                         UIS.SetStateToOwned();
                     }
                 }
@@ -616,7 +767,8 @@ public class Customization : MonoBehaviour {
         Deselect();
     }
 
-    void effectComplete(){
+    void effectComplete()
+    {
         partChangeEffect.position = OFFeffectSetPosition;
     }
 }
